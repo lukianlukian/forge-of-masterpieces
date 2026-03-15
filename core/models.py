@@ -18,6 +18,14 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    @property
+    def is_freelancer(self):
+        return self.role == self.ROLE_FREELANCER
+
+    @property
+    def is_employer(self):
+        return self.role == self.ROLE_EMPLOYER
+
 class Skill(models.Model):
     name = models.CharField(max_length=100)
 
