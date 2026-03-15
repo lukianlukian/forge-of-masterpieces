@@ -1,0 +1,15 @@
+from django.urls import path
+
+from core.views import (
+    JobApplicationView,
+    index,
+)
+
+app_name = "core"
+
+
+urlpatterns = [
+    path("", index, name="home"),
+    path("jobapplication/", JobApplicationView.as_view(), name="jobappl"),
+]
+
