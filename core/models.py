@@ -26,6 +26,10 @@ class User(AbstractUser):
     def is_employer(self):
         return self.role == self.ROLE_EMPLOYER
 
+    @property
+    def get_user(self):
+        return self.get_full_name()
+
 class Skill(models.Model):
     name = models.CharField(max_length=100)
 

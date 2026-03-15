@@ -1,0 +1,10 @@
+<h1>{{ freelancer.user.username }}</h1>
+<p>{{ freelancer.bio }}</p>
+<p>Rate: ${{ freelancer.hourly_rate }}/hr</p>
+<p>Experience: {{ freelancer.years_experience }}</p>
+<p>Completed projects: {{ freelancer.completed_projects }}</p>
+<p>Skills:
+    {% for skill in freelancer.skills.all %}
+        {{ skill.name }}
+    {% endfor %}
+</p>

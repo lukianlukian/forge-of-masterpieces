@@ -1,0 +1,6 @@
+<h1>All job available:</h1>
+<ul>
+  {% for job in jobs %}
+    <a href="{% url 'core:job' pk=job.pk %}">{{ job.title }}</a>
+  {% endfor %}
+</ul>
