@@ -1,4 +1,168 @@
-<h1>{{ job.title }}</h1>
-<p>{{ job.description }}</p>
-<p>Budget: ${{ job.budget }}</p>
-<p>Posted by: {{ job.employer.username }}</p>
+{% extends "base.html" %}
+{% block title %}{{ job.title }} — WorkForge{% endblock %}
+{% block extra_css %}
+<!--
+  JOB DETAIL PAGE
+  Layout adapted from Freeio Job Single Page
+  https://themeforest.net/item/freeio/46155854
+  Sidebar card style from Jobpply free template
+  https://colorlib.com/wp/template/jobpply/
+-->
+<style>
+.job-banner{background:#fff;border-bottom:1px solid var(--border);padding:30px 0}
+.job-banner-inner{max-width:1320px;margin:0 auto;padding:0 24px}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:20px}
+.breadcrumb a{color:var(--muted);text-decoration:none}
+.breadcrumb a:hover{color:var(--blue)}
+.breadcrumb i{font-size:10px}
+.job-hero{display:flex;align-items:flex-start;gap:20px}
+.job-hero-logo{width:68px;height:68px;border-radius:var(--r-md);background:#f1f2f4;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--blue);flex-shrink:0}
+.job-hero-info{flex:1}
+.job-hero-title{font-size:24px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px}
+.job-hero-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.job-meta-pill{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.job-hero-actions{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+
+.apply-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px}
+.apply-card-top{background:var(--blue);padding:20px;text-align:center}
+.apply-card-budget{font-size:28px;font-weight:800;color:#fff}
+.apply-card-budget-label{font-size:13px;color:rgba(255,255,255,.6);margin-top:2px}
+.apply-card-body{padding:18px}
+.apply-info-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.apply-info-row:last-child{border-bottom:none}
+.apply-info-label{color:var(--muted)}
+.apply-info-val{font-weight:600;color:var(--ink)}
+
+.app-card{background:#f8f9fa;border-radius:var(--r-md);padding:16px;margin-bottom:10px;border:1px solid var(--border)}
+.app-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.app-actions{display:flex;gap:6px;margin-top:12px}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="job-banner">
+  <div class="job-banner-inner">
+    <div class="breadcrumb">
+      <a href="{% url 'core:home' %}">Home</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <a href="{% url 'core:jobs' %}">Jobs</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <span>{{ job.title|truncatechars:40 }}</span>
+    </div>
+    <div class="job-hero">
+      <div class="job-hero-logo">{{ job.employer.username|slice:":1"|upper }}</div>
+      <div class="job-hero-info">
+        <div class="job-hero-title">{{ job.title }}</div>
+        <div class="job-hero-meta">
+          {% with ep=job.employer.employerprofile %}
+            <span class="job-meta-pill"><i class="fa-solid fa-building"></i> {{ ep.company_name|default:job.employer.get_full_name|default:job.employer.username }}</span>
+          {% endwith %}
+          <span class="job-meta-pill"><i class="fa-regular fa-clock"></i> Posted {{ job.created_at|timesince }} ago</span>
+          <span class="job-meta-pill"><i class="fa-regular fa-file-lines"></i> {{ applications.count }} proposals</span>
+          <span class="badge {% if job.status == 'open' %}badge-green{% else %}badge-gray{% endif %}">{{ job.status|capfirst }}</span>
+        </div>
+      </div>
+      {% if request.user == job.employer %}
+      <div class="job-hero-actions">
+        <a href="{% url 'core:job-edit' job.pk %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-pen"></i> Edit</a>
+        <a href="{% url 'core:job-delete' job.pk %}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i> Delete</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="detail-grid">
+
+    <div>
+      <div class="card mb-16">
+        <div style="font-size:16px;font-weight:700;margin-bottom:14px">Job Description</div>
+        <p style="color:var(--ink2);line-height:1.85;font-size:14px;white-space:pre-line">{{ job.description }}</p>
+        {% if job.skills_required.all %}
+        <div style="margin-top:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:10px">Skills Required</div>
+          <div class="skills-row">{% for s in job.skills_required.all %}<span class="badge-skill">{{ s.name }}</span>{% endfor %}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if request.user.is_authenticated and request.user.is_freelancer and job.status == 'open' %}
+      <div class="card mb-16">
+        <div style="font-size:16px;font-weight:700;margin-bottom:14px">Submit a Proposal</div>
+        {% if already_applied %}
+          <div class="alert alert-info"><i class="fa-solid fa-circle-info" style="flex-shrink:0"></i> You have already submitted a proposal for this job.</div>
+        {% else %}
+          <form method="post" action="{% url 'core:apply' job.pk %}">
+            {% csrf_token %}
+            <div class="form-group"><label>Cover Letter</label>{{ application_form.cover_letter }}</div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Proposal</button>
+          </form>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if request.user == job.employer and applications %}
+      <div class="card">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">Proposals <span style="color:var(--muted);font-weight:400;font-size:14px">({{ applications.count }})</span></div>
+        {% for app in applications %}
+        <div class="app-card">
+          <div class="app-card-head">
+            <div class="flex gap-8">
+              <div class="avatar avatar-sm">{{ app.freelancer.username|slice:":2"|upper }}</div>
+              <div>
+                <a href="{% url 'core:freelancer-detail' app.freelancer.freelancerprofile.pk %}" style="font-weight:700;font-size:14px;color:var(--ink)">{{ app.freelancer.get_full_name|default:app.freelancer.username }}</a>
+                <div style="font-size:12px;color:var(--muted)">{{ app.created_at|date:"M d, Y" }}</div>
+              </div>
+            </div>
+            <span class="badge {% if app.status == 'accepted' %}badge-green{% elif app.status == 'rejected' %}badge-orange{% else %}badge-yellow{% endif %}">{{ app.status|capfirst }}</span>
+          </div>
+          <p style="font-size:13px;color:var(--ink2);line-height:1.65">{{ app.cover_letter }}</p>
+          <div class="app-actions">
+            <form method="post" action="{% url 'core:application-status' app.pk %}">{% csrf_token %}<input type="hidden" name="status" value="accepted"><button class="btn btn-success btn-sm" type="submit"><i class="fa-solid fa-check"></i> Accept</button></form>
+            <form method="post" action="{% url 'core:application-status' app.pk %}">{% csrf_token %}<input type="hidden" name="status" value="rejected"><button class="btn btn-danger btn-sm" type="submit"><i class="fa-solid fa-xmark"></i> Reject</button></form>
+            <a href="{% url 'core:conversation' app.freelancer.pk %}" class="btn btn-outline btn-sm"><i class="fa-regular fa-comment"></i> Message</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div>
+      <div class="apply-card">
+        <div class="apply-card-top">
+          <div class="apply-card-budget">${{ job.budget }}</div>
+          <div class="apply-card-budget-label">Project Budget</div>
+        </div>
+        <div class="apply-card-body">
+          <div class="apply-info-row"><span class="apply-info-label">Status</span><span class="badge {% if job.status == 'open' %}badge-green{% else %}badge-gray{% endif %}">{{ job.status|capfirst }}</span></div>
+          <div class="apply-info-row"><span class="apply-info-label">Posted</span><span class="apply-info-val">{{ job.created_at|date:"M d, Y" }}</span></div>
+          <div class="apply-info-row"><span class="apply-info-label">Proposals</span><span class="apply-info-val">{{ applications.count }}</span></div>
+          {% if request.user.is_authenticated and request.user.is_freelancer and job.status == 'open' and not already_applied %}
+          <a href="#apply-form" class="btn btn-primary btn-block mt-12">Apply Now <i class="fa-solid fa-arrow-right"></i></a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px">About the Employer</div>
+        {% with ep=job.employer.employerprofile %}{% if ep %}
+        <div class="flex mb-12">
+          <div class="avatar avatar-md">{{ job.employer.username|slice:":2"|upper }}</div>
+          <div>
+            <a href="{% url 'core:employer-detail' ep.pk %}" style="font-weight:700;font-size:14px;color:var(--ink)">{{ job.employer.get_full_name|default:job.employer.username }}</a>
+            {% if ep.company_name %}<div style="font-size:12px;color:var(--muted)">{{ ep.company_name }}</div>{% endif %}
+          </div>
+        </div>
+        <span class="badge badge-green mb-12"><i class="fa-solid fa-circle-check"></i> Verified Employer</span>
+        <div style="font-size:13px;color:var(--muted);margin-top:10px">Member since {{ job.employer.date_joined|date:"Y" }}</div>
+        <a href="{% url 'core:conversation' job.employer.pk %}" class="btn btn-outline btn-block mt-12 btn-sm"><i class="fa-regular fa-comment"></i> Message Employer</a>
+        {% endif %}{% endwith %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

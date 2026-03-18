@@ -1,6 +1,152 @@
-<h1>All job available:</h1>
-<ul>
-  {% for job in jobs %}
-    <a href="{% url 'core:job' pk=job.pk %}">{{ job.title }}</a>
-  {% endfor %}
-</ul>
+{% extends "base.html" %}
+{% block title %}Browse Jobs — WorkForge{% endblock %}
+{% block extra_css %}
+<!--
+  JOB LIST PAGE
+  Layout (banner + sidebar filters + job rows) directly adapted from:
+  Jobboard Free Template — colorlib.com/wp/template/jobboard/
+  Search bar style from Jobstart Free Template — colorlib.com/wp/template/jobstart/
+-->
+<style>
+.jobs-banner{background:#fff;border-bottom:1px solid var(--border);padding:32px 0}
+.jobs-banner-inner{max-width:1320px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.jobs-banner h1{font-size:24px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
+.jobs-banner p{font-size:13px;color:var(--muted);margin-top:2px}
+.jobs-search{display:flex;flex:1;min-width:260px;max-width:480px;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:#fff}
+.jobs-search input{flex:1;padding:11px 14px;border:none;outline:none;font-family:var(--font);font-size:14px;color:var(--ink)}
+.jobs-search input::placeholder{color:#b5bac3}
+.jobs-search button{padding:11px 20px;background:var(--blue);color:#fff;border:none;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
+.jobs-search button:hover{background:var(--blue-h)}
+
+.filter-widget{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+.filter-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--ink)}
+.filter-body{padding:12px 18px}
+.f-check{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-size:13px;color:var(--ink2)}
+.f-check input[type=checkbox]{width:15px;height:15px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.f-check:hover{color:var(--blue)}
+.f-count{margin-left:auto;font-size:11px;color:var(--muted);background:#f1f2f4;padding:1px 6px;border-radius:10px}
+
+.job-row{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:10px;display:flex;gap:16px;align-items:flex-start;transition:all .18s;text-decoration:none;color:inherit}
+.job-row:hover{border-color:var(--blue);box-shadow:var(--shadow);text-decoration:none}
+.job-row-logo{width:52px;height:52px;border-radius:var(--r-md);background:#f1f2f4;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--blue);flex-shrink:0}
+.job-row-body{flex:1;min-width:0}
+.job-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+.job-row-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.job-row-co{font-size:12px;color:var(--muted)}
+.job-row-desc{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:10px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.job-row-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.job-meta-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.job-row-budget{font-size:17px;font-weight:700;color:var(--ink);flex-shrink:0}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="jobs-banner">
+  <div class="jobs-banner-inner">
+    <div>
+      <h1>Browse Jobs</h1>
+      <p>Find your next project from verified employers</p>
+    </div>
+    <form method="get" class="jobs-search">
+      <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Job title, keyword…">
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </form>
+    {% if request.user.is_authenticated and request.user.is_employer %}
+      <a href="{% url 'core:job-create' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Post a Job</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="sidebar-grid">
+
+    <!-- Sidebar -->
+    <aside>
+      <div class="filter-widget">
+        <div class="filter-head">Job Type</div>
+        <div class="filter-body">
+          <label class="f-check"><input type="checkbox" checked> Full-time <span class="f-count">34</span></label>
+          <label class="f-check"><input type="checkbox" checked> Contract <span class="f-count">28</span></label>
+          <label class="f-check"><input type="checkbox"> Part-time <span class="f-count">12</span></label>
+          <label class="f-check"><input type="checkbox"> Remote <span class="f-count">41</span></label>
+        </div>
+      </div>
+      <div class="filter-widget">
+        <div class="filter-head">Experience Level</div>
+        <div class="filter-body">
+          <label class="f-check"><input type="checkbox"> Entry Level</label>
+          <label class="f-check"><input type="checkbox" checked> Mid Level</label>
+          <label class="f-check"><input type="checkbox" checked> Senior</label>
+          <label class="f-check"><input type="checkbox"> Expert</label>
+        </div>
+      </div>
+      <div class="filter-widget">
+        <div class="filter-head">Budget Range</div>
+        <div class="filter-body">
+          <label class="f-check"><input type="checkbox"> Under $1,000</label>
+          <label class="f-check"><input type="checkbox" checked> $1,000 – $5,000</label>
+          <label class="f-check"><input type="checkbox"> $5,000 – $15,000</label>
+          <label class="f-check"><input type="checkbox"> $15,000+</label>
+        </div>
+      </div>
+      <div class="filter-widget">
+        <div class="filter-head">Status</div>
+        <div class="filter-body">
+          <label class="f-check"><input type="checkbox" checked> Open</label>
+          <label class="f-check"><input type="checkbox"> Closed</label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Job list -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <span style="font-size:14px;color:var(--muted)"><strong style="color:var(--ink)">{{ jobs|length }}</strong> jobs found</span>
+        <select class="form-control" style="width:190px;font-size:13px;padding:8px 32px 8px 12px">
+          <option>Most Recent</option>
+          <option>Highest Budget</option>
+          <option>Most Proposals</option>
+        </select>
+      </div>
+
+      {% for job in jobs %}
+      <a href="{% url 'core:job-detail' job.pk %}" class="job-row">
+        <div class="job-row-logo">{{ job.employer.username|slice:":1"|upper }}</div>
+        <div class="job-row-body">
+          <div class="job-row-top">
+            <div>
+              <div class="job-row-title">{{ job.title }}</div>
+              <div class="job-row-co">{{ job.employer.get_full_name|default:job.employer.username }}{% with ep=job.employer.employerprofile %} &bull; {{ ep.company_name|default:"Independent" }}{% endwith %}</div>
+            </div>
+            <div class="job-row-budget">${{ job.budget }}</div>
+          </div>
+          <div class="job-row-desc">{{ job.description }}</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div class="skills-row">{% for s in job.skills_required.all|slice:":4" %}<span class="badge-skill">{{ s.name }}</span>{% endfor %}</div>
+            <div class="job-row-meta" style="margin-left:auto">
+              <span class="badge {% if job.status == 'open' %}badge-green{% else %}badge-gray{% endif %}"><i class="fa-solid fa-circle" style="font-size:7px"></i> {{ job.status|capfirst }}</span>
+              <span class="job-meta-item"><i class="fa-regular fa-clock"></i> {{ job.created_at|timesince }} ago</span>
+              <span class="job-meta-item"><i class="fa-regular fa-file-lines"></i> {{ job.applications.count }} proposals</span>
+            </div>
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <div class="card" style="text-align:center;padding:60px;color:var(--muted)">
+        <i class="fa-solid fa-briefcase" style="font-size:40px;margin-bottom:16px;display:block;color:var(--border)"></i>
+        No jobs found matching your search.
+      </div>
+      {% endfor %}
+
+      {% if is_paginated %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}
+        <span class="cur">{{ page_obj.number }}</span>
+        {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

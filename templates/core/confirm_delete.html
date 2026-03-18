@@ -1,14 +1,12 @@
-{% extends "base.html" %}
-{% block title %}Confirm Delete — WorkForge{% endblock %}
+{% extends "base.html" %}{% block title %}Confirm Delete — WorkForge{% endblock %}
 {% block content %}
-<div style="max-width:420px;margin:80px auto;padding:0 24px;">
-  <div class="card" style="text-align:center;padding:40px;">
-    <div style="font-size:40px;margin-bottom:16px;">⚠️</div>
-    <div style="font-family:var(--font-head);font-size:22px;font-weight:600;margin-bottom:10px;">Delete {{ type|capfirst }}?</div>
-    <p class="text-muted" style="margin-bottom:28px;line-height:1.6;">Are you sure you want to delete <strong>{{ object }}</strong>? This action cannot be undone.</p>
-    <form method="post" style="display:flex;gap:10px;justify-content:center;">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+<div style="max-width:440px;margin:80px auto;padding:0 24px">
+  <div class="card" style="text-align:center;padding:40px">
+    <div style="width:60px;height:60px;background:var(--orange-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--orange);font-size:24px"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:10px">Delete {{ type|capfirst }}?</div>
+    <p style="color:var(--muted);font-size:14px;line-height:1.65;margin-bottom:24px">Are you sure you want to delete <strong style="color:var(--ink)">{{ object }}</strong>? This action cannot be undone.</p>
+    <form method="post" style="display:flex;gap:10px;justify-content:center">{% csrf_token %}
+      <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Delete</button>
       <a href="javascript:history.back()" class="btn btn-outline">Cancel</a>
     </form>
   </div>

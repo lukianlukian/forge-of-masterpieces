@@ -1,2 +1,98 @@
-<h1>{{ employer.company_name }}</h1>
-<p>{{ employer.bio }}</p>
+{% extends "base.html" %}
+{% block title %}{{ employer.company_name|default:employer.user.username }} — WorkForge{% endblock %}
+{% block extra_css %}
+<!-- Layout inspired by Freeio Employer Single Page (themeforest.net/item/freeio/46155854) -->
+<style>
+.profile-banner{background:#fff;border-bottom:1px solid var(--border);padding:32px 0}
+.profile-banner-inner{max-width:1320px;margin:0 auto;padding:0 24px}
+.employer-hero{display:flex;align-items:flex-start;gap:22px}
+.emp-name{font-size:24px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+.emp-co{font-size:15px;color:var(--blue);font-weight:600;margin-bottom:12px}
+.page-views-card{background:linear-gradient(135deg,var(--blue),#0856b3);border-radius:var(--r-lg);padding:20px;text-align:center;color:#fff;margin-bottom:14px}
+.pv-num{font-size:36px;font-weight:800}
+.pv-label{font-size:12px;opacity:.7;margin-top:3px}
+.pv-note{font-size:11px;opacity:.5;margin-top:8px}
+</style>
+{% endblock %}
+{% block content %}
+<div class="profile-banner">
+  <div class="profile-banner-inner">
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:20px">
+      <a href="{% url 'core:home' %}" style="color:var(--muted)">Home</a> <i class="fa-solid fa-chevron-right" style="font-size:10px"></i>
+      <span>Employer Profile</span>
+    </div>
+    <div class="employer-hero">
+      <div class="avatar avatar-xl">{% if employer.user.avatar %}<img src="{{ employer.user.avatar.url }}"/>{% else %}{{ employer.user.username|slice:":2"|upper }}{% endif %}</div>
+      <div style="flex:1">
+        <div class="emp-name">{{ employer.user.get_full_name|default:employer.user.username }}</div>
+        {% if employer.company_name %}<div class="emp-co"><i class="fa-solid fa-building"></i> {{ employer.company_name }}</div>{% endif %}
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          <span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Verified Employer</span>
+          <span class="badge badge-blue"><i class="fa-regular fa-calendar"></i> Since {{ employer.user.date_joined|date:"Y" }}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+        {% if is_owner %}
+          <a href="{% url 'core:edit-employer' %}" class="btn btn-outline btn-sm"><i class="fa-solid fa-pen"></i> Edit Profile</a>
+          <a href="{% url 'core:job-create' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Post a Job</a>
+        {% else %}
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'core:conversation' employer.user.pk %}" class="btn btn-primary"><i class="fa-regular fa-comment"></i> Send Message</a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="detail-grid">
+    <div>
+      {% if employer.bio %}
+      <div class="card mb-16">
+        <div style="font-size:15px;font-weight:700;margin-bottom:12px">About the Company</div>
+        <p style="color:var(--ink2);line-height:1.85;font-size:14px">{{ employer.bio }}</p>
+      </div>
+      {% endif %}
+
+      <div class="card mb-16" style="background:var(--blue-bg);border-color:#b3d1f4">
+        <div style="font-size:15px;font-weight:700;margin-bottom:14px">Why freelancers trust this employer</div>
+        <div class="g2" style="gap:14px">
+          <div class="flex"><i class="fa-solid fa-circle-check" style="color:var(--green);flex-shrink:0"></i><div><div style="font-weight:600;font-size:14px">Verified Identity</div><div style="font-size:12px;color:var(--muted)">Email and company confirmed</div></div></div>
+          <div class="flex"><i class="fa-solid fa-credit-card" style="color:var(--blue);flex-shrink:0"></i><div><div style="font-weight:600;font-size:14px">Payment on File</div><div style="font-size:12px;color:var(--muted)">Ready to pay contractors</div></div></div>
+          <div class="flex"><i class="fa-solid fa-briefcase" style="color:var(--blue);flex-shrink:0"></i><div><div style="font-weight:600;font-size:14px">{{ open_jobs.count }} Active Jobs</div><div style="font-size:12px;color:var(--muted)">Currently hiring</div></div></div>
+          <div class="flex"><i class="fa-solid fa-calendar" style="color:var(--muted);flex-shrink:0"></i><div><div style="font-weight:600;font-size:14px">Member Since {{ employer.user.date_joined|date:"Y" }}</div><div style="font-size:12px;color:var(--muted)">Established employer</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:15px;font-weight:700;margin-bottom:14px">Open Positions</div>
+        {% for job in open_jobs %}
+        <a href="{% url 'core:job-detail' job.pk %}" style="display:block;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:10px;text-decoration:none;color:inherit;transition:border-color .15s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">{{ job.title }}</div>
+          <div class="flex gap-8"><span class="badge badge-green">Open</span><span style="font-size:12px;color:var(--muted)">${{ job.budget }}</span><span style="font-size:12px;color:var(--muted)">{{ job.applications.count }} proposals</span></div>
+        </a>
+        {% empty %}<p style="color:var(--muted);font-size:14px">No open jobs at the moment.</p>{% endfor %}
+      </div>
+    </div>
+
+    <div>
+      {% if is_owner %}
+      <div class="page-views-card">
+        <div class="pv-num">{{ employer.page_views }}</div>
+        <div class="pv-label">Profile Views</div>
+        <div class="pv-note"><i class="fa-solid fa-eye"></i> Only visible to you</div>
+      </div>
+      {% endif %}
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">Company Info</div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+          <div class="flex"><i class="fa-solid fa-building" style="color:var(--muted);width:16px"></i> {{ employer.company_name|default:"Independent employer" }}</div>
+          <div class="flex"><i class="fa-regular fa-calendar" style="color:var(--muted);width:16px"></i> Joined {{ employer.user.date_joined|date:"F Y" }}</div>
+          <div class="flex"><i class="fa-solid fa-briefcase" style="color:var(--muted);width:16px"></i> {{ open_jobs.count }} open positions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

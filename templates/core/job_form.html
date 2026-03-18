@@ -1,24 +1,26 @@
-{% extends "base.html" %}
-{% block title %}{{ action }} Job — WorkForge{% endblock %}
+{% extends "base.html" %}{% block title %}{{ action }} Job — WorkForge{% endblock %}
 {% block content %}
-<div class="page-wrap-sm">
-  <div class="page-header"><h1>{{ action }} Job Offer</h1></div>
-  <div class="card">
-    <form method="post">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="form-group">
-          <label>{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}<div class="form-error">{{ field.errors.0 }}</div>{% endif %}
-        </div>
-      {% endfor %}
-      <div class="flex" style="gap:10px;margin-top:8px;">
-        <button type="submit" class="btn btn-primary">{{ action }} Job</button>
-        <a href="{% url 'core:jobs' %}" class="btn btn-outline">Cancel</a>
-      </div>
-    </form>
+<!-- Self-written form page using base card layout -->
+<div class="wrap-sm">
+  <div class="page-head">
+    <h1>{{ action }} Job Offer</h1>
+    <p>Fill in the details for your job listing</p>
   </div>
+<div class="card"><form method="post">
+  {% csrf_token %}{% for field in form %}
+    <div class="form-group">
+      <label>{{ field.label }}</label>{{ field }}{% if field.errors %}
+      <div class="form-error"><i class="fa-solid fa-circle-exclamation">
+        </i>{{ field.errors.0 }}
+      </div>
+    {% endif %}
+    </div>
+  {% endfor %}
+<div class="flex" style="gap:10px">
+  <button type="submit" class="btn btn-primary">{{ action }} Job</button>
+  <a href="{% url 'core:jobs' %}" class="btn btn-outline">Cancel</a>
+</div>
+</form>
+</div>
 </div>
 {% endblock %}
-`

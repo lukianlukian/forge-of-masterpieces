@@ -1,10 +1,92 @@
-<h1>here is the freeeelancersss:</h1>
-<ul>
-  {% for freelancer in freelancers %}
-    <li>
-    <a href="{% url 'core:freelancer' pk=freelancer.pk %}">
-        {{ freelancer.user.username }}
-    </a>
-  </li>
-  {% endfor %}
-</ul>
+{% extends "base.html" %}
+{% block title %}Find Freelancers — WorkForge{% endblock %}
+{% block extra_css %}
+<!--
+  FREELANCER LIST
+  Card grid layout adapted from Freeio Find Talent page
+  https://themeforest.net/item/freeio/46155854
+  Sidebar filter style from Jobboard Free Template (colorlib.com/wp/template/jobboard/)
+-->
+<style>
+.fl-banner{background:#fff;border-bottom:1px solid var(--border);padding:28px 0}
+.fl-banner-inner{max-width:1320px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.fl-banner h1{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.fl-banner p{font-size:13px;color:var(--muted);margin-top:2px}
+.fl-search{display:flex;flex:1;max-width:380px;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;background:#fff}
+.fl-search input{flex:1;padding:10px 14px;border:none;outline:none;font-family:var(--font);font-size:14px;color:var(--ink)}
+.fl-search input::placeholder{color:#b5bac3}
+.fl-search button{padding:10px 18px;background:var(--blue);color:#fff;border:none;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.fl-search button:hover{background:var(--blue-h)}
+.filter-widget{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+.filter-head{padding:13px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700}
+.filter-body{padding:12px 18px}
+.f-check{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-size:13px;color:var(--ink2)}
+.f-check input[type=checkbox]{width:15px;height:15px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.f-check:hover{color:var(--blue)}
+
+.fl-card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;display:flex;flex-direction:column;gap:14px;transition:all .18s;text-decoration:none;color:inherit;height:100%}
+.fl-card:hover{border-color:var(--blue);box-shadow:var(--shadow);transform:translateY(-2px);text-decoration:none}
+.fl-card-top{display:flex;align-items:flex-start;gap:12px}
+.fl-card-name{font-size:15px;font-weight:700;color:var(--ink)}
+.fl-card-title{font-size:12px;color:var(--muted);margin-top:2px}
+.fl-card-rate{font-size:14px;font-weight:700;color:var(--blue);margin-top:4px}
+.fl-card-bio{font-size:13px;color:var(--muted);line-height:1.65;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.fl-card-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);margin-top:auto}
+.fl-stat{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.fl-stat strong{color:var(--ink);font-weight:700}
+.rating-stars{color:var(--yellow);font-size:13px;letter-spacing:1px}
+</style>
+{% endblock %}
+{% block content %}
+<div class="fl-banner">
+  <div class="fl-banner-inner">
+    <div><h1>Find Freelancers</h1><p>Browse verified professionals ready for your project</p></div>
+    <form method="get" class="fl-search">
+      <input type="text" name="skill" value="{{ request.GET.skill }}" placeholder="Search by skill…">
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </form>
+  </div>
+</div>
+<div class="wrap">
+  <div class="sidebar-grid">
+    <aside>
+      <div class="filter-widget"><div class="filter-head">Category</div><div class="filter-body"><label class="f-check"><input type="checkbox" checked> Development</label><label class="f-check"><input type="checkbox"> Design</label><label class="f-check"><input type="checkbox"> Writing</label><label class="f-check"><input type="checkbox"> Marketing</label><label class="f-check"><input type="checkbox"> Data Science</label></div></div>
+      <div class="filter-widget"><div class="filter-head">Experience</div><div class="filter-body"><label class="f-check"><input type="checkbox"> Entry Level</label><label class="f-check"><input type="checkbox" checked> Mid Level</label><label class="f-check"><input type="checkbox" checked> Senior</label><label class="f-check"><input type="checkbox"> Expert</label></div></div>
+      <div class="filter-widget"><div class="filter-head">Hourly Rate</div><div class="filter-body"><label class="f-check"><input type="checkbox"> Under $25/hr</label><label class="f-check"><input type="checkbox" checked> $25–$75/hr</label><label class="f-check"><input type="checkbox"> $75–$150/hr</label><label class="f-check"><input type="checkbox"> $150+/hr</label></div></div>
+      <div class="filter-widget"><div class="filter-head">Min. Rating</div><div class="filter-body"><label class="f-check"><input type="checkbox" checked> <span style="color:var(--yellow)">★★★★★</span>&nbsp;5.0</label><label class="f-check"><input type="checkbox" checked> <span style="color:var(--yellow)">★★★★</span>☆&nbsp;4+</label><label class="f-check"><input type="checkbox"> <span style="color:var(--yellow)">★★★</span>☆☆&nbsp;3+</label></div></div>
+    </aside>
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <span style="font-size:14px;color:var(--muted)"><strong style="color:var(--ink)">{{ freelancers|length }}</strong> freelancers found</span>
+        <select class="form-control" style="width:190px;font-size:13px;padding:8px 32px 8px 12px"><option>Best Match</option><option>Highest Rated</option><option>Most Projects</option><option>Lowest Rate</option></select>
+      </div>
+      <div class="g3">
+        {% for fl in freelancers %}
+        <a href="{% url 'core:freelancer-detail' fl.pk %}" class="fl-card">
+          <div class="fl-card-top">
+            <div class="avatar avatar-lg">{% if fl.user.avatar %}<img src="{{ fl.user.avatar.url }}"/>{% else %}{{ fl.user.username|slice:":2"|upper }}{% endif %}</div>
+            <div style="flex:1">
+              <div class="fl-card-name">{{ fl.user.get_full_name|default:fl.user.username }}</div>
+              <div class="fl-card-title">{{ fl.experience_level }}</div>
+              <div class="fl-card-rate">${{ fl.hourly_rate }}<span style="font-size:11px;font-weight:400;color:var(--muted)">/hr</span></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px"><span class="rating-stars">★</span><span style="font-size:13px;font-weight:700">{{ fl.rating }}</span><span style="font-size:12px;color:var(--muted)">({{ fl.completed_projects }} reviews)</span></div>
+          <div class="fl-card-bio">{{ fl.bio|default:"No bio yet." }}</div>
+          <div class="skills-row">{% for s in fl.skills.all|slice:":4" %}<span class="badge-skill">{{ s.name }}</span>{% endfor %}</div>
+          <div class="fl-card-bottom">
+            <span class="fl-stat"><i class="fa-solid fa-briefcase"></i><strong>{{ fl.completed_projects }}</strong> jobs</span>
+            <span class="fl-stat"><i class="fa-solid fa-clock"></i><strong>{{ fl.years_experienced }}y</strong> exp</span>
+          </div>
+        </a>
+        {% empty %}
+        <div class="card" style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><i class="fa-solid fa-users" style="font-size:40px;margin-bottom:16px;display:block;color:var(--border)"></i>No freelancers found.</div>
+        {% endfor %}
+      </div>
+      {% if is_paginated %}
+      <div class="pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}<span class="cur">{{ page_obj.number }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
