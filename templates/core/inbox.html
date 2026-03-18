@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Inbox — WorkForge{% endblock %}
+{% block content %}
+<div class="page-wrap-sm">
+  <div class="page-header"><h1>Inbox</h1><p>Your conversations</p></div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    {% for partner in partners %}
+    <a href="{% url 'core:conversation' partner.pk %}" style="text-decoration:none;color:inherit;">
+      <div class="card card-hover" style="display:flex;align-items:center;gap:16px;">
+        <div class="avatar">
+          {% if partner.avatar %}<img src="{{ partner.avatar.url }}" />{% else %}{{ partner.username|slice:":2"|upper }}{% endif %}
+        </div>
+        <div style="flex:1;">
+          <div style="font-weight:700;">{{ partner.get_full_name|default:partner.username }}</div>
+          <div class="text-sm text-muted">{{ partner.role|capfirst }}</div>
+        </div>
+        {% for k,v in unread_counts.items %}{% if k == partner.pk and v %}
+          <span class="badge badge-blue">{{ v }} new</span>
+        {% endif %}{% endfor %}
+      </div>
+    </a>
+    {% empty %}
+      <div class="card" style="text-align:center;padding:60px;color:var(--muted);">
+        No conversations yet. <a href="{% url 'core:freelancer-list' %}">Browse freelancers</a> or <a href="{% url 'core:jobs' %}">jobs</a>.
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

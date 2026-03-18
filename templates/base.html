@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}WorkForge{% endblock %}</title>
+  <!--
+    BASE LAYOUT
+    Navbar inspired by: Freeio Freelance Marketplace HTML Template
+    https://themeforest.net/item/freeio-freelance-services-marketplace-job-board-html-template/46155854
+    Footer inspired by: Jobpply Free Job Board Template - colorlib.com
+    https://colorlib.com/wp/template/jobpply/
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --white:#fff;
+      --bg:#f4f6fc;
+      --surface:#fff;
+      --ink:#18191c;
+      --ink2:#424447;
+      --muted:#767f8c;
+      --border:#e4e5e8;
+      --blue:#0a65cc;
+      --blue-h:#0856b3;
+      --blue-bg:#e8f1fb;
+      --green:#0ba02c;
+      --green-bg:#e7f6ec;
+      --orange:#e05151;
+      --orange-bg:#fef3f2;
+      --yellow:#ffb836;
+      --yellow-bg:#fff8ee;
+      --r:4px;
+      --r-md:8px;
+      --r-lg:12px;
+      --shadow:0 4px 20px rgba(24,25,28,.07);
+      --shadow-sm:0 2px 8px rgba(24,25,28,.06);
+      --font:'Plus Jakarta Sans',system-ui,sans-serif;
+    }
+    body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+    img{display:block;max-width:100%}
+
+    /* ─── NAVBAR ─── */
+    .header{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:var(--shadow-sm)}
+    .header-inner{max-width:1320px;margin:0 auto;padding:0 24px;height:72px;display:flex;align-items:center;gap:16px}
+    .site-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+    .site-logo-mark{width:38px;height:38px;background:var(--blue);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:800}
+    .site-logo-text{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.5px}
+    .site-logo-text span{color:var(--blue)}
+    .header-nav{display:flex;align-items:center;gap:2px;margin-left:20px}
+    .header-nav a{font-size:14px;font-weight:500;color:var(--ink2);padding:8px 13px;border-radius:var(--r);transition:all .15s;text-decoration:none;white-space:nowrap}
+    .header-nav a:hover{color:var(--blue);background:var(--blue-bg)}
+    .header-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+    .header-icon-btn{width:40px;height:40px;border:1px solid var(--border);border-radius:var(--r-md);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;cursor:pointer;transition:all .15s;text-decoration:none}
+    .header-icon-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+    .header-ava{width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;text-decoration:none;overflow:hidden;border:2px solid var(--blue-bg)}
+    .header-ava img{width:100%;height:100%;object-fit:cover}
+    .header-sep{width:1px;height:28px;background:var(--border)}
+
+    /* ─── BTN ─── */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .15s;line-height:1;white-space:nowrap}
+    .btn:hover{text-decoration:none}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-primary:hover{background:var(--blue-h);box-shadow:0 6px 16px rgba(10,101,204,.3)}
+    .btn-outline{background:#fff;border:1px solid var(--border);color:var(--ink2)}
+    .btn-outline:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+    .btn-success{background:var(--green);color:#fff}
+    .btn-success:hover{background:#088c24}
+    .btn-danger{background:var(--orange);color:#fff}
+    .btn-danger:hover{background:#c43d3d}
+    .btn-ghost{background:transparent;color:var(--muted)}
+    .btn-ghost:hover{background:var(--bg);color:var(--ink)}
+    .btn-sm{padding:7px 14px;font-size:13px}
+    .btn-lg{padding:13px 28px;font-size:15px}
+    .btn-block{width:100%}
+
+    /* ─── CARD ─── */
+    .card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow-sm)}
+    .card-sm{padding:16px}
+    .card-hover{transition:border-color .18s,box-shadow .18s,transform .15s;cursor:pointer}
+    .card-hover:hover{border-color:var(--blue);box-shadow:var(--shadow);transform:translateY(-2px)}
+
+    /* ─── BADGE ─── */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r);font-size:12px;font-weight:600;line-height:1.4}
+    .badge-blue{background:var(--blue-bg);color:var(--blue)}
+    .badge-green{background:var(--green-bg);color:var(--green)}
+    .badge-orange{background:var(--orange-bg);color:var(--orange)}
+    .badge-yellow{background:var(--yellow-bg);color:var(--yellow)}
+    .badge-gray{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+    .badge-skill{background:#f1f2f4;color:var(--ink2);border-radius:var(--r);font-size:12px;font-weight:500;padding:4px 10px}
+
+    /* ─── FORM ─── */
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+    .form-control{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;color:var(--ink);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;appearance:none}
+    .form-control::placeholder{color:#c0c4cc}
+    .form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,101,204,.1)}
+    textarea.form-control{resize:vertical;min-height:110px}
+    select.form-control{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23767f8c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+    .form-error{font-size:12px;color:var(--orange);margin-top:4px;display:flex;align-items:center;gap:4px}
+    .form-hint{font-size:12px;color:var(--muted);margin-top:4px}
+
+    /* ─── ALERT ─── */
+    .alert{padding:12px 16px;border-radius:var(--r-md);font-size:14px;font-weight:500;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px;border:1px solid transparent}
+    .alert-success{background:var(--green-bg);border-color:#a7e0b5;color:#076b1f}
+    .alert-error{background:var(--orange-bg);border-color:#f7bcbc;color:#a83232}
+    .alert-info{background:var(--blue-bg);border-color:#b3d1f4;color:#0a4fa0}
+    .alert-warning{background:var(--yellow-bg);border-color:#ffd58a;color:#8a5a00}
+
+    /* ─── AVATAR ─── */
+    .avatar{border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;overflow:hidden}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .avatar-xs{width:28px;height:28px;font-size:10px}
+    .avatar-sm{width:36px;height:36px;font-size:12px}
+    .avatar-md{width:48px;height:48px;font-size:16px}
+    .avatar-lg{width:64px;height:64px;font-size:20px}
+    .avatar-xl{width:96px;height:96px;font-size:30px}
+
+    /* ─── LAYOUT ─── */
+    .wrap{max-width:1320px;margin:0 auto;padding:32px 24px;flex:1}
+    .wrap-sm{max-width:840px;margin:0 auto;padding:32px 24px;flex:1}
+    .page-head{margin-bottom:24px}
+    .page-head h1{font-size:24px;font-weight:800;letter-spacing:-.3px}
+    .page-head p{color:var(--muted);margin-top:4px;font-size:14px}
+    .sidebar-grid{display:grid;grid-template-columns:252px 1fr;gap:24px;align-items:start}
+    .detail-grid{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start}
+
+    /* ─── GRID ─── */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+
+    /* ─── FLEX ─── */
+    .flex{display:flex;align-items:center;gap:10px}
+    .flex-b{display:flex;align-items:center;justify-content:space-between}
+    .flex-col{display:flex;flex-direction:column;gap:8px}
+    .flex-wrap{display:flex;flex-wrap:wrap;gap:6px}
+
+    /* ─── SPACE ─── */
+    .mt-4{margin-top:4px}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+    .mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-24{margin-bottom:24px}
+
+    /* ─── TYPE ─── */
+    .text-xs{font-size:12px}.text-sm{font-size:13px}
+    .text-muted{color:var(--muted)}.text-blue{color:var(--blue)}.text-green{color:var(--green)}
+    .fw-bold{font-weight:700}.fw-semi{font-weight:600}
+    .skills-row{display:flex;flex-wrap:wrap;gap:6px}
+    .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+
+    /* ─── WIDGET ─── */
+    .widget{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px}
+    .widget-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:space-between}
+    .widget-body{padding:16px 18px}
+    .filter-item{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-size:14px;color:var(--ink2)}
+    .filter-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+    .filter-item:hover{color:var(--blue)}
+    .filter-count{margin-left:auto;font-size:12px;color:var(--muted)}
+
+    /* ─── PAGINATION ─── */
+    .pagination{display:flex;gap:4px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+    .pagination a,.pagination span{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 8px;border-radius:var(--r);font-size:14px;font-weight:500;border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all .15s}
+    .pagination a:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+    .pagination .cur{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+    /* ─── FOOTER ─── */
+    .footer{background:#18191c;color:rgba(255,255,255,.45);padding:60px 0 28px;margin-top:auto}
+    .footer-inner{max-width:1320px;margin:0 auto;padding:0 24px}
+    .footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+    .footer-brand{font-size:20px;font-weight:800;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+    .footer-brand-mark{width:34px;height:34px;background:var(--blue);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff}
+    .footer-brand span{color:#4b8ee8}
+    .footer-desc{font-size:13px;line-height:1.75;max-width:280px}
+    .footer-col-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:16px;text-transform:uppercase;letter-spacing:.6px}
+    .footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:10px;transition:color .15s}
+    .footer-col a:hover{color:#fff;text-decoration:none}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:13px;flex-wrap:wrap;gap:12px}
+    .footer-bottom a{color:rgba(255,255,255,.35)}
+    .footer-bottom a:hover{color:#fff;text-decoration:none}
+
+    @media(max-width:1024px){.sidebar-grid,.detail-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr;gap:28px}}
+    @media(max-width:768px){.header-inner{padding:0 16px}.header-nav{display:none}.g2,.g3,.g4{grid-template-columns:1fr}.wrap,.wrap-sm{padding:20px 16px}.footer-grid{grid-template-columns:1fr}}
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% block navbar %}
+<header class="header">
+  <div class="header-inner">
+    <a href="{% url 'core:home' %}" class="site-logo">
+      <div class="site-logo-mark"><i class="fa-solid fa-hammer"></i></div>
+      <span class="site-logo-text">Work<span>Forge</span></span>
+    </a>
+    <nav class="header-nav">
+      <a href="{% url 'core:jobs' %}">Find Jobs</a>
+      <a href="{% url 'core:freelancer-list' %}">Freelancers</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'core:inbox' %}">Messages</a>
+        {% if user.is_freelancer %}<a href="{% url 'core:my-applications' %}">Applications</a>{% endif %}
+        {% if user.is_employer %}<a href="{% url 'core:job-create' %}">Post a Job</a>{% endif %}
+      {% endif %}
+    </nav>
+    <div class="header-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'core:inbox' %}" class="header-icon-btn" title="Inbox"><i class="fa-regular fa-envelope"></i></a>
+        <div class="header-sep"></div>
+        {% if user.is_employer %}{% with p=user.employerprofile %}{% if p %}
+          <a href="{% url 'core:employer-detail' p.pk %}" class="header-ava">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt=""/>{% else %}{{ user.username|slice:":2"|upper }}{% endif %}</a>
+        {% endif %}{% endwith %}{% else %}{% with p=user.freelancerprofile %}{% if p %}
+          <a href="{% url 'core:freelancer-detail' p.pk %}" class="header-ava">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt=""/>{% else %}{{ user.username|slice:":2"|upper }}{% endif %}</a>
+        {% endif %}{% endwith %}{% endif %}
+        <a href="{% url 'core:logout' %}" class="btn btn-ghost btn-sm">Logout</a>
+      {% else %}
+        <a href="{% url 'core:login' %}" class="btn btn-outline btn-sm">Sign In</a>
+        <a href="{% url 'core:register' %}" class="btn btn-primary btn-sm">Get Started</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+{% endblock %}
+
+<main style="flex:1">
+  {% if messages %}
+  <div style="max-width:1320px;margin:0 auto;padding:16px 24px 0">
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">
+      <i class="fa-solid {% if msg.tags == 'success' %}fa-circle-check{% elif msg.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-info{% endif %}" style="flex-shrink:0;margin-top:1px"></i>
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <div class="footer-brand-mark"><i class="fa-solid fa-hammer"></i></div>
+          Work<span>Forge</span>
+        </div>
+        <p class="footer-desc">The platform where top freelancers and serious employers connect. Fast, direct, professional.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">For Freelancers</div>
+        <a href="{% url 'core:jobs' %}">Browse Jobs</a>
+        <a href="{% url 'core:my-applications' %}">My Applications</a>
+        <a href="{% url 'core:register' %}">Create Profile</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">For Employers</div>
+        <a href="{% url 'core:freelancer-list' %}">Find Freelancers</a>
+        <a href="{% url 'core:job-create' %}">Post a Job</a>
+        <a href="{% url 'core:register' %}">Join Free</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <a href="#">About</a>
+        <a href="#">How it works</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 WorkForge. All rights reserved.</span>
+      <div style="display:flex;gap:20px"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

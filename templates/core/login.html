@@ -1,6 +1,86 @@
-<h1>Login</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+{% extends "base.html" %}
+{% block title %}Sign In — WorkForge{% endblock %}
+{% block navbar %}{% endblock %}
+{% block extra_css %}
+<!--
+  LOGIN PAGE
+  Adapted from Colorlib Login Form #14 (split layout with image left, form right)
+  Source: https://colorlib.com/wp/html5-and-css3-login-forms/
+  Original: colorlib.com/etc/lf/Login-v14/
+-->
+<style>
+.auth-page{min-height:100vh;display:flex}
+.auth-panel-left{flex:1;background:linear-gradient(160deg,#062466 0%,#0a65cc 100%);display:flex;flex-direction:column;justify-content:space-between;padding:48px 56px;position:relative;overflow:hidden}
+.auth-panel-left::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;border:1px solid rgba(255,255,255,.06);top:-200px;right:-200px}
+.auth-panel-left::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;border:1px solid rgba(255,255,255,.04);bottom:-100px;left:-100px}
+.auth-logo-link{display:flex;align-items:center;gap:10px;text-decoration:none;position:relative;z-index:1}
+.auth-logo-mark{width:38px;height:38px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px}
+.auth-logo-name{font-size:20px;font-weight:800;color:#fff;letter-spacing:-.4px}
+.auth-panel-content{position:relative;z-index:1}
+.auth-panel-title{font-size:40px;font-weight:800;color:#fff;line-height:1.12;letter-spacing:-.6px;margin-bottom:16px}
+.auth-panel-sub{font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;max-width:380px}
+.auth-testimonial{position:relative;z-index:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-lg);padding:22px}
+.auth-test-text{font-size:14px;color:rgba(255,255,255,.75);line-height:1.65;margin-bottom:14px;font-style:italic}
+.auth-test-author{display:flex;align-items:center;gap:10px}
+.auth-test-ava{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.auth-test-name{font-size:13px;font-weight:700;color:#fff}
+.auth-test-role{font-size:12px;color:rgba(255,255,255,.4)}
+
+.auth-panel-right{width:480px;background:#fff;display:flex;align-items:center;justify-content:center;padding:48px 48px}
+.auth-box{width:100%;max-width:360px}
+.auth-heading{font-size:26px;font-weight:800;letter-spacing:-.3px;color:var(--ink);margin-bottom:6px}
+.auth-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.auth-sub a{color:var(--blue);font-weight:600;text-decoration:none}
+.auth-sub a:hover{text-decoration:underline}
+.f-group{margin-bottom:16px}
+.f-group label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.f-group input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;color:var(--ink);background:#fff;outline:none;transition:all .15s}
+.f-group input::placeholder{color:#c0c4cc}
+.f-group input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(10,101,204,.1)}
+.f-err{font-size:12px;color:var(--orange);margin-top:4px;display:flex;align-items:center;gap:4px}
+.auth-submit{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.auth-submit:hover{background:var(--blue-h);box-shadow:0 6px 16px rgba(10,101,204,.3);transform:translateY(-1px)}
+@media(max-width:900px){.auth-panel-left{display:none}.auth-panel-right{width:100%;min-height:100vh}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-panel-left">
+    <a href="{% url 'core:home' %}" class="auth-logo-link">
+      <div class="auth-logo-mark"><i class="fa-solid fa-hammer"></i></div>
+      <span class="auth-logo-name">WorkForge</span>
+    </a>
+    <div class="auth-panel-content">
+      <div class="auth-panel-title">Welcome back to<br>WorkForge</div>
+      <p class="auth-panel-sub">The platform where top freelancers and serious employers connect. Thousands of jobs are waiting for you.</p>
+    </div>
+    <div class="auth-testimonial">
+      <p class="auth-test-text">"Found a senior Django developer within 48 hours. The quality of talent on WorkForge is genuinely impressive."</p>
+      <div class="auth-test-author">
+        <div class="auth-test-ava">SC</div>
+        <div><div class="auth-test-name">Sophia Chen</div><div class="auth-test-role">CTO, NovaTech Ltd</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-panel-right">
+    <div class="auth-box">
+      <div class="auth-heading">Sign in to your account</div>
+      <p class="auth-sub">Don't have an account? <a href="{% url 'core:register' %}">Create one free →</a></p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="f-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" id="{{ field.id_for_label }}"
+            placeholder="{% if field.html_name == 'username' %}Enter your username{% else %}Enter your password{% endif %}"
+            {% if field.value %}value="{{ field.value }}"{% endif %}>
+          {% for e in field.errors %}<div class="f-err"><i class="fa-solid fa-circle-exclamation"></i>{{ e }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="auth-submit">Sign In <i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

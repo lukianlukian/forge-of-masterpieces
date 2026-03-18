@@ -29,7 +29,7 @@ from core.models import (
 )
 
 
-# ── Home ──────────────────────────────────────────────────────────────────────
+# Home
 
 def index(request: HttpRequest) -> HttpResponse:
     context = {
@@ -46,8 +46,7 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(request, "core/home.html", context)
 
 
-# ── Auth ──────────────────────────────────────────────────────────────────────
-
+# Auth
 def register(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -81,7 +80,7 @@ def logout_view(request: HttpRequest) -> HttpResponse:
     return redirect("core:home")
 
 
-# ── Freelancer ────────────────────────────────────────────────────────────────
+# Freelancer
 
 class FreelancerListView(generic.ListView):
     model = FreelancerProfile
@@ -127,7 +126,7 @@ def edit_freelancer_profile(request: HttpRequest) -> HttpResponse:
     return render(request, "core/edit_profile.html", {"form": form, "avatar_form": avatar_form})
 
 
-# ── Employer ──────────────────────────────────────────────────────────────────
+# Employer
 
 class EmployerDetailView(generic.DetailView):
     model = EmployerProfile
@@ -163,7 +162,7 @@ def edit_employer_profile(request: HttpRequest) -> HttpResponse:
     return render(request, "core/edit_profile.html", {"form": form, "avatar_form": avatar_form})
 
 
-# ── Jobs ──────────────────────────────────────────────────────────────────────
+# Jobs
 
 class JobListView(generic.ListView):
     model = JobOffer
@@ -231,7 +230,7 @@ def delete_job(request: HttpRequest, pk: int) -> HttpResponse:
     return render(request, "core/confirm_delete.html", {"object": job, "type": "job"})
 
 
-# ── Applications ──────────────────────────────────────────────────────────────
+# Applications
 
 @login_required
 def apply_to_job(request: HttpRequest, pk: int) -> HttpResponse:
@@ -276,7 +275,7 @@ def my_applications(request: HttpRequest) -> HttpResponse:
     return render(request, "core/my_applications.html", {"applications": apps})
 
 
-# ── Messages ──────────────────────────────────────────────────────────────────
+# Messages
 
 @login_required
 def inbox(request: HttpRequest) -> HttpResponse:
@@ -328,7 +327,7 @@ def conversation(request: HttpRequest, user_id: int) -> HttpResponse:
     })
 
 
-# ── Reviews ───────────────────────────────────────────────────────────────────
+# Reviews
 
 @login_required
 def add_review(request: HttpRequest, user_id: int) -> HttpResponse:
@@ -344,7 +343,7 @@ def add_review(request: HttpRequest, user_id: int) -> HttpResponse:
     return redirect(request.META.get("HTTP_REFERER", "core:home"))
 
 
-# ── kept for backwards compat (was in your original urls.py) ─────────────────
+# kept for backwards compat (was in your original urls.py)
 
 class JobApplicationView(LoginRequiredMixin, generic.ListView):
     model = JobApplication

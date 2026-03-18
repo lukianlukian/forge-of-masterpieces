@@ -1,6 +1,135 @@
-<h1>register</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Register</button>
-</form>
+{% extends "base.html" %}
+{% block title %}Create Account — WorkForge{% endblock %}
+{% block navbar %}{% endblock %}
+{% block extra_css %}
+<style>
+  .auth-wrap { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; }
+  .auth-side { background:var(--ink); color:#fff; display:flex; flex-direction:column; justify-content:space-between; padding:48px 56px; position:relative; overflow:hidden; }
+  .auth-side::before { content:''; position:absolute; top:-100px; right:-100px; width:400px; height:400px; border-radius:50%; border:1px solid rgba(255,255,255,.06); }
+  .auth-side-logo { font-family:var(--font-head); font-size:24px; font-weight:600; color:#fff; text-decoration:none; position:relative; z-index:1; }
+  .auth-side-logo span { color:#93c5fd; }
+  .auth-side-body { position:relative; z-index:1; }
+  .auth-side-title { font-family:var(--font-head); font-size:36px; font-weight:500; line-height:1.2; margin-bottom:16px; }
+  .auth-side-title em { color:#93c5fd; font-style:normal; }
+  .auth-side-sub { font-size:15px; font-weight:300; color:rgba(255,255,255,.5); line-height:1.7; }
+  .perks { list-style:none; position:relative; z-index:1; }
+  .perks li { font-size:13px; color:rgba(255,255,255,.55); margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+  .perks li::before { content:'✓'; color:#93c5fd; font-weight:700; }
+
+  .auth-form-side { background:#fff; display:flex; align-items:center; justify-content:center; padding:48px 40px; overflow-y:auto; }
+  .auth-box { width:100%; max-width:420px; animation:fadeUp .35s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  .auth-heading { font-family:var(--font-head); font-size:28px; font-weight:500; color:var(--ink); margin-bottom:6px; }
+  .auth-sub { font-size:14px; color:var(--muted); margin-bottom:24px; }
+  .auth-sub a { color:var(--accent); font-weight:600; text-decoration:none; }
+
+  .role-label { font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--ink2); display:block; margin-bottom:8px; }
+  .role-toggle { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
+  .role-opt { position:relative; }
+  .role-opt input { position:absolute; opacity:0; }
+  .role-opt label { display:flex; flex-direction:column; align-items:center; gap:5px; padding:14px 12px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; font-family:var(--font-body); font-size:13px; font-weight:600; color:var(--ink2); transition:all .15s; }
+  .role-opt label .ri { font-size:20px; }
+  .role-opt label .rd { font-size:11px; font-weight:400; color:var(--muted); }
+  .role-opt input:checked + label { border-color:var(--accent); background:var(--accent-bg); color:var(--accent); }
+
+  .name-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--ink2); margin-bottom:7px; }
+  .field input { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:9px; font-family:var(--font-body); font-size:14px; color:var(--ink); background:var(--bg); transition:border-color .15s,box-shadow .15s,background .15s; outline:none; }
+  .field input::placeholder { color:#cbd0db; }
+  .field input:focus { border-color:var(--accent); background:#fff; box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+  .field-err { font-size:12px; color:var(--red); margin-top:4px; }
+  .field-hint { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  .submit-btn { width:100%; padding:13px; background:var(--accent); color:#fff; border:none; border-radius:9px; font-family:var(--font-body); font-size:15px; font-weight:700; cursor:pointer; transition:background .15s,transform .12s,box-shadow .15s; margin-top:6px; }
+  .submit-btn:hover { background:var(--accent-h); box-shadow:0 4px 16px rgba(37,99,235,.3); transform:translateY(-1px); }
+  .terms { font-size:12px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.6; }
+  .terms a { color:var(--accent); text-decoration:none; }
+
+  @media(max-width:760px){
+    .auth-wrap{grid-template-columns:1fr;}
+    .auth-side{display:none;}
+    .auth-form-side{padding:40px 20px; min-height:100vh;}
+    .name-row{grid-template-columns:1fr;}
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-side">
+    <a href="{% url 'core:home' %}" class="auth-side-logo">Work<span>Forge</span></a>
+    <div class="auth-side-body">
+      <div class="auth-side-title">Start your<br><em>journey</em> today</div>
+      <p class="auth-side-sub">Join the platform where serious people get things done.</p>
+    </div>
+    <ul class="perks">
+      <li>Free to create an account</li>
+      <li>Apply to jobs or post your own</li>
+      <li>Direct messaging, no middlemen</li>
+      <li>Profile visible to hundreds of employers</li>
+    </ul>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-box">
+      <div class="auth-heading">Create account</div>
+      <p class="auth-sub">Already have one? <a href="{% url 'core:login' %}">Sign in</a></p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <span class="role-label">I am a…</span>
+        <div class="role-toggle">
+          <div class="role-opt">
+            <input type="radio" name="role" id="r-free" value="freelancer"
+              {% if form.role.value != 'employer' %}checked{% endif %}>
+            <label for="r-free">
+              <span class="ri">💼</span>Freelancer<span class="rd">Looking for work</span>
+            </label>
+          </div>
+          <div class="role-opt">
+            <input type="radio" name="role" id="r-emp" value="employer"
+              {% if form.role.value == 'employer' %}checked{% endif %}>
+            <label for="r-emp">
+              <span class="ri">🏢</span>Employer<span class="rd">Hiring talent</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="name-row">
+          <div class="field">
+            <label>First name</label>
+            <input type="text" name="first_name" placeholder="Jane" value="{{ form.first_name.value|default:'' }}">
+            {% for e in form.first_name.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" name="last_name" placeholder="Smith" value="{{ form.last_name.value|default:'' }}">
+            {% for e in form.last_name.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+
+        {% for field in form %}
+          {% if field.html_name not in 'first_name,last_name,role' %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <input type="{{ field.field.widget.input_type }}"
+                   name="{{ field.html_name }}"
+                   id="{{ field.id_for_label }}"
+                   placeholder="{% if field.html_name == 'username' %}choose a username{% elif field.html_name == 'email' %}you@example.com{% else %}••••••••{% endif %}"
+                   {% if field.value %}value="{{ field.value }}"{% endif %}>
+            {% for e in field.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+            {% if field.help_text %}<div class="field-hint">{{ field.help_text }}</div>{% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        <button type="submit" class="submit-btn">Create Account →</button>
+        <p class="terms">By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a></p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
