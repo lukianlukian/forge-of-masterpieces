@@ -1,6 +1,10 @@
 <h1>here is the freeeelancersss:</h1>
 <ul>
   {% for freelancer in freelancers %}
-    <li>{{ freelancer.user.username }}</li>
+    <li>
+    <a href="{% url 'core:freelancer' pk=freelancer.pk %}">
+        {{ freelancer.user.username }}
+    </a>
+  </li>
   {% endfor %}
 </ul>
