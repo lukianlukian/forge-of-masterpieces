@@ -205,21 +205,46 @@
         {% if user.is_employer %}<a href="{% url 'core:job-create' %}">Post a Job</a>{% endif %}
       {% endif %}
     </nav>
-    <div class="header-actions">
-      {% if user.is_authenticated %}
-        <a href="{% url 'core:inbox' %}" class="header-icon-btn" title="Inbox"><i class="fa-regular fa-envelope"></i></a>
-        <div class="header-sep"></div>
-        {% if user.is_employer %}{% with p=user.employerprofile %}{% if p %}
-          <a href="{% url 'core:employer-detail' p.pk %}" class="header-ava">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt=""/>{% else %}{{ user.username|slice:":2"|upper }}{% endif %}</a>
-        {% endif %}{% endwith %}{% else %}{% with p=user.freelancerprofile %}{% if p %}
-          <a href="{% url 'core:freelancer-detail' p.pk %}" class="header-ava">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt=""/>{% else %}{{ user.username|slice:":2"|upper }}{% endif %}</a>
-        {% endif %}{% endwith %}{% endif %}
-        <a href="{% url 'core:logout' %}" class="btn btn-ghost btn-sm">Logout</a>
-      {% else %}
-        <a href="{% url 'core:login' %}" class="btn btn-outline btn-sm">Sign In</a>
-        <a href="{% url 'core:register' %}" class="btn btn-primary btn-sm">Get Started</a>
-      {% endif %}
-    </div>
+<div class="header-actions">
+  {% if user.is_authenticated %}
+    <a href="{% url 'core:inbox' %}" class="header-icon-btn" title="Inbox">
+      <i class="fa-regular fa-envelope"></i>
+    </a>
+
+    <div class="header-sep"></div>
+
+    {% if user.is_employer %}
+      {% with ep=user.employerprofile %}
+        {% if ep %}
+          <a href="{% url 'core:employer-detail' ep.pk %}" class="header-ava" title="My profile">
+            {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+            {% else %}
+              {{ user.username|slice:":2"|upper }}
+            {% endif %}
+          </a>
+        {% endif %}
+      {% endwith %}
+    {% elif user.is_freelancer %}
+      {% with fp=user.freelancerprofile %}
+        {% if fp %}
+          <a href="{% url 'core:freelancer-detail' fp.pk %}" class="header-ava" title="My profile">
+            {% if user.avatar %}
+              <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+            {% else %}
+              {{ user.username|slice:":2"|upper }}
+            {% endif %}
+          </a>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+
+    <a href="{% url 'core:logout' %}" class="btn btn-ghost btn-sm">Logout</a>
+  {% else %}
+    <a href="{% url 'core:login' %}" class="btn btn-outline btn-sm">Sign In</a>
+    <a href="{% url 'core:register' %}" class="btn btn-primary btn-sm">Get Started</a>
+  {% endif %}
+</div>
   </div>
 </header>
 {% endblock %}
