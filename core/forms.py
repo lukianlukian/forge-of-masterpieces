@@ -15,18 +15,36 @@ from core.models import (
 class RegisterForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "email", "role", "password1", "password2"]
+        fields = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "avatar",
+            "password1",
+            "password2",
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
+
+        for name, field in self.fields.items():
             field.widget.attrs["class"] = "form-control"
+
+        self.fields["avatar"].required = False
 
 
 class FreelancerProfileForm(forms.ModelForm):
     class Meta:
         model = FreelancerProfile
-        fields = ["bio", "experience_level", "years_experienced", "hourly_rate", "skills"]
+        fields = [
+            "bio",
+            "experience_level",
+            "years_experienced",
+            "hourly_rate",
+            "skills",
+        ]
         widgets = {
             "bio": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "experience_level": forms.TextInput(attrs={"class": "form-control"}),
@@ -55,7 +73,7 @@ class JobOfferForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
             "budget": forms.NumberInput(attrs={"class": "form-control"}),
             "skills_required": forms.CheckboxSelectMultiple(),
-            "status": forms.Select(attrs={"class": "form-select"}),
+            "status": forms.Select(attrs={"class": "form-control"}),
         }
 
 
@@ -80,7 +98,11 @@ class MessageForm(forms.ModelForm):
         fields = ["body"]
         widgets = {
             "body": forms.Textarea(
-                attrs={"rows": 3, "class": "form-control", "placeholder": "Write a message…"}
+                attrs={
+                    "rows": 3,
+                    "class": "form-control",
+                    "placeholder": "Write a message…",
+                }
             )
         }
 
@@ -90,7 +112,9 @@ class ReviewForm(forms.ModelForm):
         model = Review
         fields = ["rating", "comment"]
         widgets = {
-            "rating": forms.NumberInput(attrs={"class": "form-control", "min": 1, "max": 5}),
+            "rating": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1, "max": 5}
+            ),
             "comment": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
         }
 
@@ -99,3 +123,6 @@ class AvatarForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["avatar"]
+        widgets = {
+            "avatar": forms.ClearableFileInput(attrs={"class": "form-control"})
+        }
