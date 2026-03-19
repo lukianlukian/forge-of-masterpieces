@@ -13,7 +13,7 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default=ROLE_FREELANCER
     )
-    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", default="avatars/default.jpg", blank=True)
 
     def __str__(self):
         return self.username
@@ -28,7 +28,7 @@ class User(AbstractUser):
 
     @property
     def get_user(self):
-        return self.get_full_name()
+        return self.get_full_name() or self.username
 
 class Skill(models.Model):
     name = models.CharField(max_length=100)
@@ -44,7 +44,7 @@ class FreelancerProfile(models.Model):
     )
     skills = models.ManyToManyField(Skill, blank=True)
     bio = models.TextField(blank=True)
-    experience_level = models.CharField(max_length=10, blank=True)
+    experience_level = models.CharField(max_length=20, blank=True)
     years_experienced = models.PositiveIntegerField(default=0)
     hourly_rate = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     completed_projects = models.PositiveIntegerField(default=0)
