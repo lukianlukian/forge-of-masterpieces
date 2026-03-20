@@ -26,3 +26,6 @@ source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+
+home page demo:
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cd5717e0-ed06-4e9a-a96f-07fb4b65e549" />
