@@ -1,22 +1,5 @@
 
 
-## Features
-
-- Register as a Freelancer or Employer
-- Post, search and apply to jobs
-- Freelancer & employer profiles with ratings and reviews
-- Direct messaging between users
-- Page view counter on employer profiles
-- Django admin panel
-
-## Tech Stack
-
-- Python 3.14 / Django 6.0
-- SQLite
-- Pillow (avatar uploads)
-- python-decouple (environment variables)
-
-
 # Freelance Marketplace﻿ forge-of-masterpieces
 
 A Django web application for connecting freelancers and employers.
