@@ -103,3 +103,13 @@ python manage.py runserve
 
 
 ## Live demo: [https://your-app.onrender.com](https://forge-of-masterpieces.onrender.com/)
+
+You can use the following test accounts to explore the application:
+
+### Employer
+- Username: test_employer
+- Password: user12345
+
+### Freelancer
+- Username: test_freelancer
+- Password: user12345
