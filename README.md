@@ -1,4 +1,4 @@
-develop
+
 # WorkForge — Freelance Marketplace
 
 A Django-based platform where freelancers find work and employers post jobs.
@@ -100,4 +100,6 @@ python manage.py runserve
 
 ## home page demo:
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cd5717e0-ed06-4e9a-a96f-07fb4b65e549" />
-main
+
+
+## Live demo: [https://your-app.onrender.com](https://forge-of-masterpieces.onrender.com/)
